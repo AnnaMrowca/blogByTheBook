@@ -2,6 +2,14 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+
+class PublishedManager(models.Manager):
+
+    """Non standard manager 'Published', further reference to code in class Post"""
+
+    def get_queryset(self):
+        return super(PublishedManager, self).get_queryset().filter(status='published')
+
 class Post(models.Model):
 
     """Model of Post"""
@@ -28,6 +36,9 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    objects = models.Manager() #default manager
+    published = PublishedManager() #mon-standard manager
+
 
     # """ Class meta contains metadata, '-publish' means that we want to display posts sorted descending =
     #   = last published posts will be on the top"""
@@ -40,3 +51,6 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+
