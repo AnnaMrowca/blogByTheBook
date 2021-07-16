@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from .models import Post
 from django.core.paginator import Paginator,EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
+from django.core.mail import send_mail
+
+from .forms import EmailPostForm
 
 class PostListView(ListView):
     queryset = Post.published.all()
@@ -38,3 +41,32 @@ def post_detail(request, year, month, day, post):
    return render(request, 'blog/post/detail.html', {'post': post})
 
 
+def post_share(request, post_id):
+    """ sharing post via email """
+    #takes post based in its id
+    post = get_object_or_404(Post, id=post_id, status='published')
+    sent = False
+
+    if request.method == 'POST':
+        #form has been sent
+        form = EmailPostForm(request.POST)
+        #verification of form's fields has been validated as correct
+        if form.is_valid():
+            cd = form.cleaned_data #if form is valid, we get access to verified data: form.cleaned_data allows us this
+            post_url = request.build_absolute_uri(post.get_absolute_url()) #get absolute url helps us
+            # taking ultimate (bezwględną) post access path.
+            # This path is then used as input data for method request.build_absolute_uri
+            # We then build complete url, with HTTP and host name.
+            # get_absolute_url conveys data to get_absolute_uri = we get link to post in the email
+            # subject and content of the message are taken from verified data taken from the form
+
+            subject = '{} ({}) encourage to read "{}"'.format(cd['name'], cd['email'], post.title)
+            message = 'Read post "{}" on a page {}\n\n comment added by {}: {}'.format(post.title, post_url, cd['name'],
+            cd['comments'])
+            send_mail(subject, message, 'amrowca@gmail.com', [cd['to']]) #we should add our email and block in settings EMAIL BACKEND
+            sent = True
+
+
+    else:
+        form = EmailPostForm()
+    return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})

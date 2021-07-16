@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post
+from .models import Post, Comment
 
 """ registering Post on admin.py allows us to make it available in admin site: url: http://127.0.0.1:8000/admin/ """
 
@@ -13,3 +13,9 @@ class PostAdmin(admin.ModelAdmin):
     date_hierarchy = 'publish' #hierarchy by publish
     ordering = ('status', 'publish') #sorted by status and publish
 
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'post','body', 'created', 'active' )
+    list_filter = ('active', 'created', 'updated')
+    search_fields = ('name', 'email', 'body')
