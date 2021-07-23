@@ -10,6 +10,8 @@
         {{post.title}}
     </a>
 </h2>
+<p class="tags">Tags: {{ .tags.all|join:", " }}</p>
+<!--join here works simirarly to join() in Python, it elements with indicated text element -->
 
 <p class="date">
     Published {{post.publish}} by {{post.author}}

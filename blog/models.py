@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
-
+from taggit.managers import TaggableManager
 
 class PublishedManager(models.Manager):
 
@@ -10,6 +10,7 @@ class PublishedManager(models.Manager):
 
     def get_queryset(self):
         return super(PublishedManager, self).get_queryset().filter(status='published')
+
 
 class Post(models.Model):
 
@@ -39,6 +40,7 @@ class Post(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     objects = models.Manager() #default manager
     published = PublishedManager() #mon-standard manager
+    tags = TaggableManager()
 
 
     # """ Class meta contains metadata, '-publish' means that we want to display posts sorted descending =
